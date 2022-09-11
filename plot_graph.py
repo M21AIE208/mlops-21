@@ -1,9 +1,3 @@
-# Author: Gael Varoquaux <gael dot varoquaux at normalesup dot org>
-# License: BSD 3 clause
-
-
-#PART: library dependencies -- sklear, torch, tensorflow, numpy, transformers
-
 # Standard scientific Python imports
 import matplotlib.pyplot as plt
 
@@ -11,8 +5,13 @@ import matplotlib.pyplot as plt
 from sklearn import datasets, svm, metrics
 from sklearn.model_selection import train_test_split
 
+#model parameters
+param_grid = [
+  {'C': [1, 10, 100, 1000], 'gamma': [0.001, 0.0001]}
+ ]
 
-GAMMA = 0.001
+
+
 train_frac = 0.8
 test_frac = 0.1
 dev_frac = 0.1
@@ -51,29 +50,41 @@ X_test, X_dev, y_test, y_dev = train_test_split(
 # Create a classifier: a support vector classifier
 clf = svm.SVC()
 
-#PART: setting up hyperparameter
-hyper_params = {'gamma':GAMMA}
-clf.set_params(**hyper_params)
+
+best_model_accuracy  = 0
+
+for c_ in param_grid[0]["C"]:
+    for gamma_ in param_grid[0]["gamma"]:
+        #PART: setting up hyperparameter
+        hyper_params = {'gamma':gamma_,'C':c_}
+        clf.set_params(**hyper_params)
 
 
-#PART: Train model
-# Learn the digits on the train subset
-clf.fit(X_train, y_train)
+        #PART: Train model
+        # Learn the digits on the train subset
+        clf.fit(X_train, y_train)
 
-#PART: Get test set predictions
-# Predict the value of the digit on the test subset
-predicted = clf.predict(X_test)
+        #PART: Get test set predictions
+        # Predict the value of the digit on the test subset
+        predicted = clf.predict(X_test)
 
-#PART: Sanity check of predictions
-_, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
-for ax, image, prediction in zip(axes, X_test, predicted):
-    ax.set_axis_off()
-    image = image.reshape(8, 8)
-    ax.imshow(image, cmap=plt.cm.gray_r, interpolation="nearest")
-    ax.set_title(f"Prediction: {prediction}")
+        #PART: Sanity check of predictions
+        _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
+        for ax, image, prediction in zip(axes, X_test, predicted):
+            ax.set_axis_off()
+            image = image.reshape(8, 8)
+            ax.imshow(image, cmap=plt.cm.gray_r, interpolation="nearest")
+            ax.set_title(f"Prediction: {prediction}")
+        
+        model_accuracy = metrics.accuracy_score(y_test, predicted)
+        if model_accuracy>best_model_accuracy:
+            best_model_accuracy = model_accuracy
+            best_param = {"gamma":gamma_,"C":c_}
 
-#PART: Compute evaluation metrics
-print(
-    f"Classification report for classifier {clf}:\n"
-    f"{metrics.classification_report(y_test, predicted)}\n"
-)
+        #PART: Compute evaluation metrics
+        print(
+            f"Classification report for classifier {clf} with Gamma {gamma_} and C {c_} is :\n"
+            f"{metrics.accuracy_score(y_test, predicted)}\n"
+        )
+
+print(f"best model accuracy is {best_model_accuracy} with parameters {best_param}")
