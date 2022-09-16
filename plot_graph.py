@@ -1,10 +1,10 @@
 # Standard scientific Python imports
 import matplotlib.pyplot as plt
-
+import numpy as np
 # Import datasets, classifiers and performance metrics
 from sklearn import datasets, svm, metrics
 from sklearn.model_selection import train_test_split
-
+from skimage.transform import resize
 #model parameters
 param_grid = [
   {'C': [1, 10, 100, 1000], 'gamma': [0.001, 0.0001]}
@@ -29,9 +29,17 @@ for ax, image, label in zip(axes, digits.images, digits.target):
 
 #PART: data pre-processing -- to remove some noise, to normalize data, format the data to be consumed by mode
 # flatten the images
+print(f"current Image size is {digits.images[0].shape}")
 n_samples = len(digits.images)
-data = digits.images.reshape((n_samples, -1))
 
+img_array=[]
+for images in digits.images:
+    image_resized = resize(images, (32,32),
+                           anti_aliasing=True)
+    img_array.append(image_resized)
+img_array=np.array(img_array)
+data = img_array.reshape((n_samples, -1))
+print(f"Scaled Image size is {img_array[0].shape}")
 
 #PART: define train/dev/test splits of experiment protocol
 # train to train model
@@ -68,13 +76,12 @@ for c_ in param_grid[0]["C"]:
         # Predict the value of the digit on the test subset
         predicted = clf.predict(X_test)
 
-        #PART: Sanity check of predictions
-        _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
-        for ax, image, prediction in zip(axes, X_test, predicted):
-            ax.set_axis_off()
-            image = image.reshape(8, 8)
-            ax.imshow(image, cmap=plt.cm.gray_r, interpolation="nearest")
-            ax.set_title(f"Prediction: {prediction}")
+#         #PART: Sanity check of predictions
+#         _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
+#         for ax, image, prediction in zip(axes, X_test, predicted):
+#             ax.set_axis_off()
+#             ax.imshow(image, cmap=plt.cm.gray_r, interpolation="nearest")
+#             ax.set_title(f"Prediction: {prediction}")
         
         model_accuracy = metrics.accuracy_score(y_test, predicted)
         if model_accuracy>best_model_accuracy:
