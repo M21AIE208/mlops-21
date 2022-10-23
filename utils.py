@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from joblib import dump
 from sklearn import svm
 from sklearn.tree import DecisionTreeClassifier
+from joblib import dump, load
 
 
 def get_all_h_param_comb(params):
@@ -106,7 +107,7 @@ def tune_and_save(clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, mod
 
     best_model_name = model_type + "_" + best_param_config + ".joblib"
     if model_path == None:
-        model_path = best_model_name
+        model_path = "./models/"+best_model_name
     dump(best_model, model_path)
 
     print("Best hyperparameters were:")
