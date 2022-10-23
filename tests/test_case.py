@@ -8,7 +8,7 @@ from utils import (
 import sys
 from joblib import dump, load
 import os
-print(os.getcwd())
+
 
 def test_gorund_truth_labels():
     digits = datasets.load_digits()
