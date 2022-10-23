@@ -12,7 +12,7 @@ from utils import (
     get_all_h_param_comb,
     tune_and_save,
 )
-sys.path.append(".")
+# sys.path.append(".")
 from plot_graph import y_train,predicted
 
 def test_gorund_truth_labels():
@@ -36,4 +36,4 @@ def test_classifier_bias():
     clf = svm.SVC()
     clf.fit(x_train, y_train)
     predicted = clf(x_test)
-    assert len(set(predicted))>1
+    assert len(set(predicted))>1  # the classifier is not predicting only one class
