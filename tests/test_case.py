@@ -1,4 +1,5 @@
-from sklearn import datasets, svm
+from sklearn import datasets
+from sklearn import svm
 from utils import (
     preprocess_digits,
     train_dev_test_split,
