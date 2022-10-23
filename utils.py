@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from joblib import dump
 from sklearn import svm
+from sklearn.tree import DecisionTreeClassifier
 
 
 def get_all_h_param_comb(params):
@@ -99,7 +100,9 @@ def tune_and_save(clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, mod
     best_param_config = "_".join([h + "=" + str(best_h_params[h]) for h in best_h_params])
     
     if type(clf) == svm.SVC:
-        model_type = 'svm' 
+        model_type = 'svm'
+    if type(clf) == DecisionTreeClassifier:
+        model_type = 'dt'
 
     best_model_name = model_type + "_" + best_param_config + ".joblib"
     if model_path == None:

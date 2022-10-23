@@ -1,12 +1,6 @@
-# Author: Gael Varoquaux <gael dot varoquaux at normalesup dot org>
-# License: BSD 3 clause
-
-
-# PART: library dependencies -- sklear, torch, tensorflow, numpy, transformers
-
-# Import datasets, classifiers and performance metrics
 from sklearn import datasets, svm, metrics
-import pdb
+from sklearn import tree
+from joblib import dump, load
 
 from utils import (
     preprocess_digits,
@@ -17,7 +11,7 @@ from utils import (
     get_all_h_param_comb,
     tune_and_save,
 )
-from joblib import dump, load
+
 
 train_frac, dev_frac, test_frac = 0.8, 0.1, 0.1
 assert train_frac + dev_frac + test_frac == 1.0
@@ -32,7 +26,7 @@ params["C"] = c_list
 
 h_param_comb = get_all_h_param_comb(params)
 
-
+choice_of_model = {"svm":svm.SVC,"decision_tree":tree.DecisionTreeClassifier}
 # PART: load dataset -- data from csv, tsv, jsonl, pickle
 digits = datasets.load_digits()
 data_viz(digits)
@@ -40,6 +34,7 @@ data, label = preprocess_digits(digits)
 # housekeeping
 del digits
 
+evaluation ={'svm':[],'decision_tree':[]}
 
 x_train, y_train, x_dev, y_dev, x_test, y_test = train_dev_test_split(
     data, label, train_frac, dev_frac
@@ -68,7 +63,9 @@ pred_image_viz(x_test, predicted)
 
 # 4. report the test set accurancy with that best model.
 # PART: Compute evaluation metrics
-print(
-    f"Classification report for classifier {clf}:\n"
-    f"{metrics.classification_report(y_test, predicted)}\n"
-)
+# print(
+#     f"Classification report for classifier {clf}:\n"
+#     f"{metrics.classification_report(y_test, predicted)}\n"
+# )
+# evaluation[model_type].append(metrics.accuracy_score(y_test, predicted))
+
