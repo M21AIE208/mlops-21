@@ -2,10 +2,18 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from joblib import dump
 from sklearn import svm
+from sklearn import tree
 
 
-def get_all_h_param_comb(params):
+def get_all_h_param_comb_svm(params):
     h_param_comb = [{"gamma": g, "C": c} for g in params['gamma'] for c in params['C']]
+    return h_param_comb
+
+def get_all_h_param_comb_tree(params):
+    h_param_comb = [{"max_depth": a, "min_samples_leaf": b,"max_features":c} \
+                    for a in params['max_depth'] \
+                    for b in params['min_samples_leaf'] \
+                    for c in params['max_features']]
     return h_param_comb
     
 def preprocess_digits(dataset):
@@ -91,19 +99,22 @@ def h_param_tuning(h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric):
 
 
 def tune_and_save(clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, model_path):
-    best_model, best_metric, best_h_params = h_param_tuning(
-        h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric
-    )
-
+    if type(clf) == svm.SVC:
+        model_type = 'svm'
+        best_model, best_metric, best_h_params = h_param_tuning(
+            h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric
+        )
+    if type(clf) == tree.DecisionTreeClassifier:
+        model_type = "dt"
+        best_model, best_metric, best_h_params = h_param_tuning(
+            h_param_comb, clf, x_train, y_train, x_dev, y_dev, metric
+        )
     # save the best_model
     best_param_config = "_".join([h + "=" + str(best_h_params[h]) for h in best_h_params])
-    
-    if type(clf) == svm.SVC:
-        model_type = 'svm' 
 
     best_model_name = model_type + "_" + best_param_config + ".joblib"
     if model_path == None:
-        model_path = best_model_name
+        model_path = "./models/"+best_model_name
     dump(best_model, model_path)
 
     print("Best hyperparameters were:")
