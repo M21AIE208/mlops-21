@@ -5,6 +5,8 @@ from train import dev_frac,train_frac,data,label
 import glob
 from sklearn.metrics import accuracy_score
 import numpy as np
+from sklearn.metrics import plot_confusion_matrix
+import matplotlib.pyplot as plt
 
 svm_accuracy_list=[]
 dt_accuracy_list=[]
@@ -18,10 +20,14 @@ for classifier in model_to_test:
             best_model = load(glob.glob(".\models\svm_*.joblib")[0])
             predicted = best_model.predict(x_test)
             svm_accuracy_list.append(accuracy_score(y_test, predicted))
+            plot_confusion_matrix(best_model, x_test, y_test)
+            plt.show()
         if classifier =="dt":
             best_model = load(glob.glob(".\models\dt_*.joblib")[0])
             predicted = best_model.predict(x_test)
             dt_accuracy_list.append(accuracy_score(y_test, predicted))
+            plot_confusion_matrix(best_model, x_test, y_test)
+            plt.show()
 
 svm_accuracy_array = np.array(svm_accuracy_list)
 dt_accuracy_array =np.array(dt_accuracy_list)

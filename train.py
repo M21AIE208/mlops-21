@@ -46,7 +46,7 @@ for classifier in model_to_test:
 
     if classifier == 'dt':
         clf = tree.DecisionTreeClassifier()
-        max_depth = [2, 4, 6, 8, 10]
+        max_depth = [2, 10, 20, 30, 100]
         min_samples_leaf = [1, 2, 3, 4, 5]
         max_features = ['auto', 'sqrt', 'log2']
         params = {}
