@@ -5,6 +5,7 @@ from sklearn import svm
 from sklearn import tree
 from sklearn.metrics import classification_report
 from joblib import load
+import glob
 
 
 def get_all_h_param_comb_svm(params):
@@ -136,5 +137,19 @@ def save_result(best_model_path,x_test,y_test,clf_name,random_state):
         fobj.write(f"model save at {best_model_path}\n")
 
 
+def find_best_model():
+    max_f1 = 0
+    file_path = ""
+    files = glob.glob("./results/*.txt")
+    for file in files:
+        with open(file, "r") as fileObj:
+            temp_list = fileObj.readlines()
+            lines_2 = temp_list[1]
+            lines_3 = temp_list[2]
+            f1_score = lines_2.split(":")[1]
 
-
+            f1_score = f1_score.replace("\n", "")
+            if float(f1_score) > max_f1:
+                max_f1 = float(f1_score)
+                file_path = lines_3.split(":")[1]
+    return file_path
