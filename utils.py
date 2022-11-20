@@ -3,6 +3,8 @@ from sklearn.model_selection import train_test_split
 from joblib import dump
 from sklearn import svm
 from sklearn import tree
+from sklearn.metrics import classification_report
+from joblib import load
 
 
 def get_all_h_param_comb_svm(params):
@@ -52,14 +54,14 @@ def pred_image_viz(x_test, predictions):
 # dev to set hyperparameters of the model
 # test to evaluate the performance of the model
 
-def train_dev_test_split(data, label, train_frac, dev_frac):
+def train_dev_test_split(data, label, train_frac, dev_frac,random_state):
 
     dev_test_frac = 1 - train_frac
     x_train, x_dev_test, y_train, y_dev_test = train_test_split(
-        data, label, test_size=dev_test_frac, shuffle=True
+        data, label, test_size=dev_test_frac, shuffle=True,random_state=random_state
     )
     x_test, x_dev, y_test, y_dev = train_test_split(
-        x_dev_test, y_dev_test, test_size=(dev_frac) / dev_test_frac, shuffle=True
+        x_dev_test, y_dev_test, test_size=(dev_frac) / dev_test_frac, shuffle=True,random_state=random_state
     )
 
     return x_train, y_train, x_dev, y_dev, x_test, y_test
@@ -123,3 +125,16 @@ def tune_and_save(clf, x_train, y_train, x_dev, y_dev, metric, h_param_comb, mod
     print("Best Metric on Dev was:{}".format(best_metric))
 
     return model_path
+
+def save_result(best_model_path,x_test,y_test,clf_name,random_state):
+    clf = load(best_model_path)
+    y_pred = clf.predict(x_test)
+    report = classification_report(y_test, y_pred,output_dict=True)
+    with open(f"./results/{clf_name}_{random_state}.txt","+w") as fobj:
+        fobj.write(f"test accuracy : {report['accuracy']}\n")
+        fobj.write(f"test macro-f1 : {report['macro avg']['f1-score']}\n")
+        fobj.write(f"model save at {best_model_path}\n")
+
+
+
+
